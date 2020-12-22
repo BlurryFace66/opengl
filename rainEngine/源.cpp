@@ -86,24 +86,46 @@ int main()
 	//glBindBuffer(GL_ARRAY_BUFFER, 0);
 	//glBindVertexArray(0);
 
-	unsigned int TexBuffer;
-	glGenTextures(1, &TexBuffer);
-	glBindTexture(GL_TEXTURE_2D, TexBuffer);
+	//材质A
+	unsigned int TexBufferA;
+	glGenTextures(1, &TexBufferA);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, TexBufferA);
 
 	int width1, height1, nrChannel;
 	stbi_set_flip_vertically_on_load(true);   //因为这个库读出来的贴图和opengl的y轴方向是相反的
-	unsigned char *data = stbi_load("pic.jpg", &width1, &height1, &nrChannel, 0);
+	unsigned char *data1 = stbi_load("pic.jpg", &width1, &height1, &nrChannel, 0);
 
-	if (data)
+	if (data1)
 	{
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width1, height1, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width1, height1, 0, GL_RGB, GL_UNSIGNED_BYTE, data1);
 		glGenerateMipmap(GL_TEXTURE_2D);
 	}
 	else
 	{
 		cout << "load image failed";
 	}
-	stbi_image_free(data);
+	stbi_image_free(data1);
+
+	//材质B
+	unsigned int TexBufferB;
+	glGenTextures(1, &TexBufferB);
+	glActiveTexture(GL_TEXTURE3);
+	glBindTexture(GL_TEXTURE_2D, TexBufferB);
+	stbi_set_flip_vertically_on_load(true);   //因为这个库读出来的贴图和opengl的y轴方向是相反的
+	unsigned char *data2 = stbi_load("awesomeface.png", &width1, &height1, &nrChannel, 0);
+
+	if (data2)
+	{
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width1, height1, 0, GL_RGBA, GL_UNSIGNED_BYTE, data2);   //因为是PNG，所以这里有A的值
+		glGenerateMipmap(GL_TEXTURE_2D);
+	}
+	else
+	{
+		cout << "load image failed";
+	}
+	stbi_image_free(data2);
+
 	//主循环
 	while (!glfwWindowShouldClose(window))  //在我们每次循环的开始前检查一次GLFW是否被要求退出
 	{
@@ -112,11 +134,16 @@ int main()
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
 
-		glBindTexture(GL_TEXTURE_2D, TexBuffer);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, TexBufferA);
+		glActiveTexture(GL_TEXTURE3);
+		glBindTexture(GL_TEXTURE_2D, TexBufferB);
 		glBindVertexArray(VAO);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 
 		testShader->use();
+		glUniform1i(glGetUniformLocation(testShader->ID, "ourTexture1"), 0);
+		glUniform1i(glGetUniformLocation(testShader->ID, "ourTexture2"), 3);   //有0~15号槽位可以用
 
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
