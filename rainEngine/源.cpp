@@ -7,6 +7,9 @@ using namespace std;
 #include"Shader.h"
 #include<GLFW/glfw3.h>
 #include"stb_image.h"
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 GLfloat vertices[] = {
 	//     ---- 位置 ----       ---- 颜色 ----     - 纹理坐标 -
@@ -126,9 +129,18 @@ int main()
 	}
 	stbi_image_free(data2);
 
+	glm::mat4 trans=glm::mat4(1.0f);
+
+	//先缩放、再旋转，最后位移
+	//trans = glm::scale(trans, glm::vec3(0.5, 0.5, 0.5));
+	//trans = glm::rotate(trans, glm::radians(90.0f), glm::vec3(0.0, 0.0, 1.0));   //该版本glm接收的是弧度，所以需要glm::radians转一下
+	//trans = glm::translate(trans, glm::vec3(-1.0f, 0, 0));
+	
 	//主循环
 	while (!glfwWindowShouldClose(window))  //在我们每次循环的开始前检查一次GLFW是否被要求退出
 	{
+		trans = glm::translate(trans, glm::vec3(0.5f, -0.5f, 0.0f));
+		trans = glm::rotate(trans, (GLfloat)glfwGetTime() * glm::radians(50.0f), glm::vec3(0.0f, 0.0f, 1.0f));
 		processInput(window);
 
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
@@ -144,6 +156,7 @@ int main()
 		testShader->use();
 		glUniform1i(glGetUniformLocation(testShader->ID, "ourTexture1"), 0);
 		glUniform1i(glGetUniformLocation(testShader->ID, "ourTexture2"), 3);   //有0~15号槽位可以用
+		glUniformMatrix4fv(glGetUniformLocation(testShader->ID, "transform"), 1, GL_FALSE, glm::value_ptr(trans));
 
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
