@@ -243,9 +243,10 @@ int main()
 			glUniformMatrix4fv(glGetUniformLocation(testShader->ID, "viewMat"), 1, GL_FALSE, glm::value_ptr(viewMat));
 			glUniformMatrix4fv(glGetUniformLocation(testShader->ID, "projMat"), 1, GL_FALSE, glm::value_ptr(projMat));
 			glUniform3f(glGetUniformLocation(testShader->ID, "objColor"), 1.0f, 0.5f, 0.31f);
-			glUniform3f(glGetUniformLocation(testShader->ID, "ambientColor"), 1.0f, 1.0f, 1.0f);
+			glUniform3f(glGetUniformLocation(testShader->ID, "ambientColor"), 0.2f, 0.2f, 0.2f);
 			glUniform3f(glGetUniformLocation(testShader->ID, "lightPos"), 10.0f, 10.0f, 5.0f);
 			glUniform3f(glGetUniformLocation(testShader->ID, "lightColor"), 1.0f, 1.0f, 1.0f);
+			glUniform3f(glGetUniformLocation(testShader->ID, "cameraPos"), camera.Position.x, camera.Position.y, camera.Position.z);
 
 			//…Ë÷√ƒ£–Õ
 			glBindVertexArray(VAO);

@@ -19,7 +19,7 @@ void main()
    //gl_Position = transform * vec4(aPos, 1.0f);
    gl_Position =projMat * viewMat * modelMat * vec4(aPos, 1.0f);
    FragPos=(modelMat*vec4(aPos.xyz,1.0)).xyz;
-   Normal=mat3(modelMat)*aNormal;
+   Normal=mat3(transpose(inverse(modelMat)))*aNormal;  //modelmat的逆转置矩阵，如果直接是modelmat在不均比例拉伸时可能出现问题
    //vertexColor = vec4(aColor, 1.0);
    //TexCoord=aTexCoord;
 };
