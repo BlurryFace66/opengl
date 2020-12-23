@@ -5,6 +5,7 @@ using namespace std;
 #define GLEW_STATIC
 #include <GL/glew.h>
 #include"Shader.h"
+#include"Camera.h"
 #include<GLFW/glfw3.h>
 #include"stb_image.h"
 #include <glm/glm.hpp>
@@ -79,7 +80,16 @@ GLuint indices[] = { // 注意索引从0开始!
 	1, 2, 3  // 第二个三角形
 };
 
+//初始化照相机类
+//Camera camera(glm::vec3(0, 0, 3.0f), glm::vec3(0, 0, 0), glm::vec3(0, 1.0f, 0));  //照相机位置，照相机目标，照相机UP轴
+Camera camera(glm::vec3(0, 0, 3.0f), glm::radians(15.0f), glm::radians(180.0f), glm::vec3(0, 1.0f, 0));
+
+float lastX;
+float lastY;
+bool firstMouse = true;
+
 void processInput(GLFWwindow* window);
+void mouse_callback(GLFWwindow* window, double xPos, double yPos);
 
 int main()
 {
@@ -99,6 +109,8 @@ int main()
 		return -1;
 	}
 	glfwMakeContextCurrent(window);
+	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	glfwSetCursorPosCallback(window, mouse_callback);
 
 	//Init GLEW
 	glewExperimental = GL_TRUE;
@@ -185,6 +197,7 @@ int main()
 	}
 	stbi_image_free(data2);
 
+	//矩阵计算
 	//glm::mat4 trans=glm::mat4(1.0f);
 
 	//先缩放、再旋转，最后位移
@@ -195,7 +208,8 @@ int main()
 	glm::mat4 modelMat = glm::mat4(1.0f);
 	modelMat = glm::rotate(modelMat, glm::radians(-55.0f), glm::vec3(1.0f, 0, 0));
 	glm::mat4 viewMat = glm::mat4(1.0f);
-	viewMat = glm::translate(viewMat, glm::vec3(0, 0, -3.0f));
+	//viewMat = glm::translate(viewMat, glm::vec3(0, 0, -3.0f));
+	//viewMat = camera.GetViewMatrix();
 	glm::mat4 projMat = glm::mat4(1.0f);
 	projMat = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f);
 
@@ -215,6 +229,9 @@ int main()
 		glBindTexture(GL_TEXTURE_2D, TexBufferB);
 		glBindVertexArray(VAO);
 		//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);  这里不需要EBO了
+
+		//照相机位置变化后，viewMatrix也要变
+		viewMat = camera.GetViewMatrix();
 
 		for (GLuint i = 0; i < 10; i++)
 		{
@@ -236,6 +253,7 @@ int main()
 
 		glfwSwapBuffers(window);   //交换颜色缓冲,前缓冲保存着最终输出的图像，它会在屏幕上显示；而所有的的渲染指令都会在后缓冲上绘制。当所有的渲染指令执行完毕后，我们交换(Swap)前缓冲和后缓冲，这样图像就立即呈显出来，之前提到的不真实感就消除了。
 		glfwPollEvents();  //检查有没有触发什么事件（比如键盘输入、鼠标移动等），然后调用对应的回调函数（可以通过回调方法手动设置）
+		camera.UpdateCameraPos();
 	}
 	glfwTerminate();  ////停止glfw
 	return 0;
@@ -247,4 +265,43 @@ void processInput(GLFWwindow* window)
 	{
 		glfwSetWindowShouldClose(window, true);
 	}
+	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+	{
+		camera.speedZ = 0.01f;
+	}
+	else if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+	{
+		camera.speedZ = -0.01f;
+	}
+	else if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+	{
+		camera.speedX = -0.01f;
+	}
+	else if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+	{
+		camera.speedX = 0.01f;
+	}
+	else
+	{
+		camera.speedZ = 0.0f;
+		camera.speedX = 0.0f;
+	}
+}
+
+void mouse_callback(GLFWwindow* window, double xPos, double yPos)
+{
+	if (firstMouse == true)
+	{
+		lastX = xPos;
+		lastY = yPos;
+		firstMouse = false;
+	}
+	float deltaX, deltaY;
+	deltaX = xPos - lastX;
+	deltaY = yPos - lastY;
+
+	lastX = xPos;
+	lastY = yPos;
+	//cout << deltaX << endl;
+	camera.ProcessMouseMovement(deltaX,deltaY);
 }
