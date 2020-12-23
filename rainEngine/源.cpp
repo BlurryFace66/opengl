@@ -239,6 +239,8 @@ int main()
 			glUniformMatrix4fv(glGetUniformLocation(testShader->ID, "modelMat"), 1, GL_FALSE, glm::value_ptr(modelMat2));
 			glUniformMatrix4fv(glGetUniformLocation(testShader->ID, "viewMat"), 1, GL_FALSE, glm::value_ptr(viewMat));
 			glUniformMatrix4fv(glGetUniformLocation(testShader->ID, "projMat"), 1, GL_FALSE, glm::value_ptr(projMat));
+			glUniform3f(glGetUniformLocation(testShader->ID, "objColor"), 1.0f, 0.5f, 0.31f);
+			glUniform3f(glGetUniformLocation(testShader->ID, "ambientColor"), 1.0f, 1.0f, 1.0f);
 
 			//ÉèÖÃÄ£ĞÍ
 			glBindVertexArray(VAO);
