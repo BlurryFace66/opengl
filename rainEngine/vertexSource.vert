@@ -2,9 +2,12 @@
 layout (location = 0) in vec3 aPos;
 layout (location = 1) in vec3 aColor;
 layout (location = 2) in vec2 aTexCoord;
+layout (location = 3) in vec3 aNormal;
 
-out vec4 ourColor;
-out vec2 TexCoord;
+//out vec4 vertexColor;
+//out vec2 TexCoord;
+out vec3 FragPos;
+out vec3 Normal;
 
 //uniform mat4 transform;
 uniform mat4 modelMat;
@@ -15,6 +18,7 @@ void main()
 {
    //gl_Position = transform * vec4(aPos, 1.0f);
    gl_Position =projMat * viewMat * modelMat * vec4(aPos, 1.0f);
-   ourColor = vec4(aColor, 1.0);
-   TexCoord=aTexCoord;
+   Normal=mat3(modelMat)*aNormal;
+   //vertexColor = vec4(aColor, 1.0);
+   //TexCoord=aTexCoord;
 };
