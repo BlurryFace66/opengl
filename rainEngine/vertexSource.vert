@@ -18,6 +18,7 @@ void main()
 {
    //gl_Position = transform * vec4(aPos, 1.0f);
    gl_Position =projMat * viewMat * modelMat * vec4(aPos, 1.0f);
+   FragPos=(modelMat*vec4(aPos.xyz,1.0)).xyz;
    Normal=mat3(modelMat)*aNormal;
    //vertexColor = vec4(aColor, 1.0);
    //TexCoord=aTexCoord;
