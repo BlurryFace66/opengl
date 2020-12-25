@@ -4,7 +4,6 @@ in vec3 FragPos;
 in vec3 Normal;
 in vec2 TexCoord;
 
-
 struct Material
 {
 	vec3 ambient;
@@ -13,21 +12,31 @@ struct Material
 	float shininess;
 };
 
+struct LightPoint
+{
+    float constant;
+    float linear;
+    float quadratic;
+};
 uniform Material material;
+uniform LightPoint lightP;
 
 //uniform sampler2D ourTexture1;
 //uniform sampler2D ourTexture2;
 uniform vec3 objColor;
 uniform vec3 ambientColor;
-//uniform vec3 lightPos;
-uniform vec3 lightDir;
+uniform vec3 lightPos;
+uniform vec3 lightDirUniform;
 uniform vec3 lightColor;
 uniform vec3 cameraPos;
 
 out vec4 FragColor;
 void main()
 {
-	//vec3 lightDir=normalize(lightPos-FragPos);
+	float dist = length(lightPos - FragPos);   //点光源会衰减
+	float attenuation = 1.0f / (lightP.constant + lightP.linear*dist +lightP.quadratic*(dist*dist));
+
+	vec3 lightDir=normalize(lightPos-FragPos);
 	vec3 reflectVec=reflect(-lightDir,Normal);
 	vec3 cameraVec=normalize(cameraPos-FragPos);
 
@@ -44,5 +53,6 @@ void main()
 	vec3 ambient=texture( material.diffuse , TexCoord ).rgb * ambientColor;
    //FragColor = mix(texture(ourTexture1,TexCoord),texture(ourTexture2,TexCoord),0.2);//如果第三个值是0.0，它会返回第一个输入；如果是1.0，会返回第二个输入值。0.2会返回80%的第一个输入颜色和20%的第二个输入颜色，即返回两个纹理的混合色。
    //FragColor=vec4(objColor*ambientColor,1.0)*mix(texture(ourTexture1,TexCoord),texture(ourTexture2,TexCoord),0.2);
-   FragColor=vec4(objColor*(diffuse+ambientColor+specular),1.0);
+
+   FragColor=vec4(objColor*(ambient+(diffuse+specular)*attenuation),1.0);  //点光源的衰减只运用在diffuse和specular上
 }
