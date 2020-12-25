@@ -4,14 +4,16 @@ using namespace std;
 
 #define GLEW_STATIC
 #include <GL/glew.h>
-#include"Shader.h"
-#include"Camera.h"
-#include"Material.h"
 #include<GLFW/glfw3.h>
 #include"stb_image.h"
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+
+#include"Shader.h"
+#include"Camera.h"
+#include"Material.h"
+#include"LightDirectional.h"
 
 #pragma region Model Data
 
@@ -84,7 +86,13 @@ GLuint indices[] = { // 注意索引从0开始!
 #pragma region Camera Declare
 //初始化照相机类
 //Camera camera(glm::vec3(0, 0, 3.0f), glm::vec3(0, 0, 0), glm::vec3(0, 1.0f, 0));  //照相机位置，照相机目标，照相机UP轴
-Camera camera(glm::vec3(0, 0, 3.0f), glm::radians(15.0f), glm::radians(180.0f), glm::vec3(0, 1.0f, 0));
+Camera camera(glm::vec3(0, 0, 3.0f), glm::radians(-15.0f), glm::radians(180.0f), glm::vec3(0, 1.0f, 0));
+
+#pragma endregion
+
+#pragma region Light Declare
+LightDirectional light = LightDirectional(glm::vec3(10.0f , 10.0f , - 5.0f),glm::vec3(glm::radians(45.0f) , glm::radians(45.0f), 0),
+	glm::vec3(10.0f, 0.0f, 0.0f));
 
 #pragma endregion
 
@@ -255,9 +263,10 @@ int main()
 			glUniformMatrix4fv(glGetUniformLocation(testShader->ID, "viewMat"), 1, GL_FALSE, glm::value_ptr(viewMat));
 			glUniformMatrix4fv(glGetUniformLocation(testShader->ID, "projMat"), 1, GL_FALSE, glm::value_ptr(projMat));
 			glUniform3f(glGetUniformLocation(testShader->ID, "objColor"), 1.0f, 1.0f, 1.0f);
-			glUniform3f(glGetUniformLocation(testShader->ID, "ambientColor"), 0.05f, 0.05f, 0.05f);
-			glUniform3f(glGetUniformLocation(testShader->ID, "lightPos"), 10.0f, 10.0f, -5.0f);
-			glUniform3f(glGetUniformLocation(testShader->ID, "lightColor"), 1.0f, 1.0f, 1.0f);
+			glUniform3f(glGetUniformLocation(testShader->ID, "ambientColor"), 0.1f, 0.1f, 0.1f);
+			//glUniform3f(glGetUniformLocation(testShader->ID, "lightPos"), light.direction.x, light.direction.y, light.direction.z);
+			glUniform3f(glGetUniformLocation(testShader->ID, "lightColor"), light.color.x,light.color.y,light.color.z);
+			glUniform3f(glGetUniformLocation(testShader->ID, "lightDir"), light.direction.x,light.direction.y,light.direction.z);
 			glUniform3f(glGetUniformLocation(testShader->ID, "cameraPos"), camera.Position.x, camera.Position.y, camera.Position.z);
 
 			myMaterial->shader->SetUniform3f("material.ambient", myMaterial->ambient);
