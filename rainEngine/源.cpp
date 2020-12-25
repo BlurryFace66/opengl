@@ -6,6 +6,7 @@ using namespace std;
 #include <GL/glew.h>
 #include"Shader.h"
 #include"Camera.h"
+#include"Material.h"
 #include<GLFW/glfw3.h>
 #include"stb_image.h"
 #include <glm/glm.hpp>
@@ -141,6 +142,16 @@ int main()
 		Shader* testShader = new Shader("vertexSource.vert", "fragmentSource.frag");
 	#pragma endregion
 
+	#pragma region Init Material
+
+			Material* myMaterial = new Material(testShader,
+				glm::vec3(0.0f, 0.0f, 1.0f),
+				glm::vec3(0.0f, 1.0f, 0.0f),
+				glm::vec3(1.0f, 1.0f, 1.0f),
+				32.0f);
+
+	#pragma endregion
+
 	#pragma region Init and Load Models to VAO,VBO
 
 		unsigned int VAO;
@@ -243,10 +254,16 @@ int main()
 			glUniformMatrix4fv(glGetUniformLocation(testShader->ID, "viewMat"), 1, GL_FALSE, glm::value_ptr(viewMat));
 			glUniformMatrix4fv(glGetUniformLocation(testShader->ID, "projMat"), 1, GL_FALSE, glm::value_ptr(projMat));
 			glUniform3f(glGetUniformLocation(testShader->ID, "objColor"), 1.0f, 0.5f, 0.31f);
-			glUniform3f(glGetUniformLocation(testShader->ID, "ambientColor"), 0.2f, 0.2f, 0.2f);
-			glUniform3f(glGetUniformLocation(testShader->ID, "lightPos"), 10.0f, 10.0f, 5.0f);
+			glUniform3f(glGetUniformLocation(testShader->ID, "ambientColor"), 0.2f, 0.1f, 0.0f);
+			glUniform3f(glGetUniformLocation(testShader->ID, "lightPos"), 10.0f, 10.0f, -5.0f);
 			glUniform3f(glGetUniformLocation(testShader->ID, "lightColor"), 1.0f, 1.0f, 1.0f);
 			glUniform3f(glGetUniformLocation(testShader->ID, "cameraPos"), camera.Position.x, camera.Position.y, camera.Position.z);
+
+			myMaterial->shader->SetUniform3f("material.ambient", myMaterial->ambient);
+			myMaterial->shader->SetUniform3f("material.diffuse", myMaterial->diffuse);
+			myMaterial->shader->SetUniform3f("material.specular", myMaterial->specular);
+			myMaterial->shader->SetUniform1f("material.shininess", myMaterial->shininess);
+	
 
 			//ÉèÖÃÄ£ĞÍ
 			glBindVertexArray(VAO);
