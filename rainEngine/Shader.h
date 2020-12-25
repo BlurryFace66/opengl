@@ -14,6 +14,12 @@ public:
 	const char* fragmentSource;
 	unsigned int ID;     //shader program ID
 
+	enum Slot
+	{
+		DIFFUSE,
+		SPECULAR
+	};
+
 	void use();
 	void SetUniform3f(const char* paramNameString, glm::vec3 param);
 	void SetUniform1f(const char* paramNameString, float param);

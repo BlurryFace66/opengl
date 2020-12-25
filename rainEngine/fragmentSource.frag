@@ -9,7 +9,7 @@ struct Material
 {
 	vec3 ambient;
 	sampler2D diffuse;
-	vec3 specular;
+	sampler2D specular;  
 	float shininess;
 };
 
@@ -30,9 +30,10 @@ void main()
 	vec3 reflectVec=reflect(-lightDir,Normal);
 	vec3 cameraVec=normalize(cameraPos-FragPos);
 
-	//specular
+	//镜面反射贴图只需要diffuse贴图的一个通道即可，所以是黑白色
+	//specular  镜反射贴图白的地方是1，1，1，所以发生镜反射，黑的地方是0，0，0乘起来还是0，不发生镜面反射
 	float specularAmount=pow(max(dot(reflectVec,cameraVec),0),material.shininess);  //因为高光值是一个0~1之间的值，所以32次方后会衰减
-	vec3 specular=material.specular * specularAmount*lightColor;
+	vec3 specular=texture( material.specular , TexCoord ).rgb* specularAmount*lightColor;
 
 	//diffuse
 	vec3 diffuse=texture( material.diffuse , TexCoord ).rgb * max(dot(lightDir,Normal),0) *lightColor;   //要保证diffuse都是正值

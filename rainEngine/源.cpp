@@ -148,8 +148,8 @@ int main()
 	#pragma region Init Material
 
 			Material* myMaterial = new Material(testShader,
-				LoadImageToGPU("container2.png",GL_RGBA, GL_RGBA, 0),
-				glm::vec3(1.0f, 1.0f, 1.0f),
+				LoadImageToGPU("container2.png",GL_RGBA, GL_RGBA, Shader::DIFFUSE),
+				LoadImageToGPU("container2_specular.png", GL_RGBA, GL_RGBA, Shader::SPECULAR),
 				glm::vec3(0.0f, 0.0f, 1.0f),
 				32.0f);
 
@@ -243,10 +243,10 @@ int main()
 			testShader->use();
 
 			//设置materials的texture参数
-			//glActiveTexture(GL_TEXTURE0);
-			//glBindTexture(GL_TEXTURE_2D, TexBufferA);
-			//glActiveTexture(GL_TEXTURE0);
-			//glBindTexture(GL_TEXTURE_2D, TexBufferB);
+			glActiveTexture(GL_TEXTURE0);
+			glBindTexture(GL_TEXTURE_2D, myMaterial->diffuse);
+			glActiveTexture(GL_TEXTURE0+1);    //或者写GL_TEXTURE1也行
+			glBindTexture(GL_TEXTURE_2D, myMaterial->specular);
 
 			//设置materials的uniform参数
 			//glUniform1i(glGetUniformLocation(testShader->ID, "ourTexture1"), 0);
@@ -262,9 +262,9 @@ int main()
 
 			myMaterial->shader->SetUniform3f("material.ambient", myMaterial->ambient);
 			//myMaterial->shader->SetUniform3f("material.diffuse", myMaterial->diffuse);
-			myMaterial->shader->SetUniform1i("material.diffuse", 0);
-
-			myMaterial->shader->SetUniform3f("material.specular", myMaterial->specular);
+			//myMaterial->shader->SetUniform3f("material.specular", myMaterial->specular);
+			myMaterial->shader->SetUniform1i("material.diffuse", Shader::DIFFUSE);
+			myMaterial->shader->SetUniform1i("material.specular", Shader::SPECULAR);
 			myMaterial->shader->SetUniform1f("material.shininess", myMaterial->shininess);
 	
 
