@@ -18,8 +18,14 @@ struct LightPoint
     float linear;
     float quadratic;
 };
+struct LightSpot
+{
+    float cosPhyInner;
+    float cosPhyOutter;
+};
 uniform Material material;
 uniform LightPoint lightP;
+uniform LightSpot lightS;
 
 //uniform sampler2D ourTexture1;
 //uniform sampler2D ourTexture2;
@@ -54,5 +60,22 @@ void main()
    //FragColor = mix(texture(ourTexture1,TexCoord),texture(ourTexture2,TexCoord),0.2);//如果第三个值是0.0，它会返回第一个输入；如果是1.0，会返回第二个输入值。0.2会返回80%的第一个输入颜色和20%的第二个输入颜色，即返回两个纹理的混合色。
    //FragColor=vec4(objColor*ambientColor,1.0)*mix(texture(ourTexture1,TexCoord),texture(ourTexture2,TexCoord),0.2);
 
-   FragColor=vec4(objColor*(ambient+(diffuse+specular)*attenuation),1.0);  //点光源的衰减只运用在diffuse和specular上
+    float cosTheta=dot(normalize(FragPos-lightPos),-1*lightDirUniform);
+	float spotRatio;
+
+   if(cosTheta>lightS.cosPhyInner)
+   {  
+		//inside
+		spotRatio=1.0;
+   }
+   else if(cosTheta>lightS.cosPhyOutter){
+		//middle
+		spotRatio=1.0-(cosTheta-lightS.cosPhyInner)/(lightS.cosPhyOutter-lightS.cosPhyInner);
+   }
+   else
+   {
+		//outside
+			spotRatio=0.0;
+   }
+   		FragColor=vec4(objColor*(ambient+(diffuse+specular)*spotRatio),1.0);
 }
