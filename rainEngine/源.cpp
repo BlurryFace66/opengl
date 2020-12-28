@@ -93,12 +93,21 @@ Camera camera(glm::vec3(0, 0, 3.0f), glm::radians(-15.0f), glm::radians(180.0f),
 #pragma endregion
 
 #pragma region Light Declare
-//LightDirectional light = LightDirectional(glm::vec3(10.0f , 10.0f , - 5.0f),glm::vec3(glm::radians(45.0f) , glm::radians(45.0f), 0),
-//	glm::vec3(10.0f, 0.0f, 0.0f));
-//LightPoint light1 = LightPoint(glm::vec3(1.0f, 1.0f, -1.0f), glm::vec3(glm::radians(45.0f), glm::radians(45.0f), 0),
-//	glm::vec3(1.0f, 1.0f, 1.0f));
-LightSpot light2 = LightSpot(glm::vec3(0.0f, 2.0f, 0.0f), glm::vec3(glm::radians(90.0f), 0, 0),
-	glm::vec3(1.0f, 1.0f, 1.0f));
+LightDirectional lightD = LightDirectional(glm::vec3(10.0f , 1.0f , - 5.0f),glm::vec3(glm::radians(45.0f) , glm::radians(45.0f), glm::radians(45.0f)),
+	glm::vec3(2.0f, 2.0f, 2.0f));
+//R,G,B三个照亮中间
+LightPoint lightP0 = LightPoint(glm::vec3(-3.0f, -2.0f, 0), glm::vec3(glm::radians(45.0f), glm::radians(45.0f), 0),
+	glm::vec3(1.0f, 0.0, 0));
+LightPoint lightP1 = LightPoint(glm::vec3(0.0f, 3.0f, 0.0f), glm::vec3(glm::radians(45.0f), glm::radians(45.0f), 0),
+	glm::vec3(0.0, 1.0f, 0));
+LightPoint lightP2 = LightPoint(glm::vec3(0, 0, 2.0f), glm::vec3(glm::radians(45.0f), glm::radians(45.0f), 0),
+	glm::vec3(0, 0, 1.0f));
+//照亮远处两个方块
+LightPoint lightP3 = LightPoint(glm::vec3(0.0f, 0.0f, -12.0f), glm::vec3(glm::radians(45.0f), glm::radians(45.0f), 0),
+	glm::vec3(1.0f, 0.0f, 1.0f));
+//聚光灯照亮底面
+LightSpot lightS = LightSpot(glm::vec3(0.0f, -5.0f, 0.0f), glm::vec3(glm::radians(-90.0f), 0, 0),
+	glm::vec3(2.0f, 2.0f, 2.0f));
 #pragma endregion
 
 #pragma region Input Declare
@@ -189,10 +198,10 @@ int main()
 		glEnableVertexAttribArray(0);
 		//光照属性
 		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
-		glEnableVertexAttribArray(2);
+		glEnableVertexAttribArray(1);
 		// UV属性
 		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid*)(6 * sizeof(GLfloat)));
-		glEnableVertexAttribArray(1);		
+		glEnableVertexAttribArray(2);		
 
 #pragma endregion
 
@@ -247,8 +256,7 @@ int main()
 		for (GLuint i = 0; i < 10; i++)
 		{
 			//设置 model matrix
-			glm::mat4 modelMat2=glm::mat4(1.0f);
-			modelMat2 = glm::translate(modelMat2, cubePositions[i]);
+			modelMat = glm::translate(glm::mat4(1.0f), cubePositions[i]);
 
 			//可以在这里设置MVP（因为正常游戏引擎里模型是变动的）
 
@@ -264,30 +272,55 @@ int main()
 			//设置materials的uniform参数
 			//glUniform1i(glGetUniformLocation(testShader->ID, "ourTexture1"), 0);
 			//glUniform1i(glGetUniformLocation(testShader->ID, "ourTexture2"), 3);   //有0~15号槽位可以用
-			glUniformMatrix4fv(glGetUniformLocation(testShader->ID, "modelMat"), 1, GL_FALSE, glm::value_ptr(modelMat2));
+			glUniformMatrix4fv(glGetUniformLocation(testShader->ID, "modelMat"), 1, GL_FALSE, glm::value_ptr(modelMat));
 			glUniformMatrix4fv(glGetUniformLocation(testShader->ID, "viewMat"), 1, GL_FALSE, glm::value_ptr(viewMat));
 			glUniformMatrix4fv(glGetUniformLocation(testShader->ID, "projMat"), 1, GL_FALSE, glm::value_ptr(projMat));
 			glUniform3f(glGetUniformLocation(testShader->ID, "objColor"), 1.0f, 1.0f, 1.0f);
 			glUniform3f(glGetUniformLocation(testShader->ID, "ambientColor"), 0.1f, 0.1f, 0.1f);
 			
 			//平行光
-			//glUniform3f(glGetUniformLocation(testShader->ID, "lightColor"), light.color.x,light.color.y,light.color.z);
-			//glUniform3f(glGetUniformLocation(testShader->ID, "lightDir"), light.direction.x,light.direction.y,light.direction.z);
+			glUniform3f(glGetUniformLocation(testShader->ID, "lightD.pos"), lightD.position.x, lightD.position.y, lightD.position.z);
+			glUniform3f(glGetUniformLocation(testShader->ID, "lightD.color"), lightD.color.x,lightD.color.y,lightD.color.z);
+			glUniform3f(glGetUniformLocation(testShader->ID, "lightD.dirToLight"), lightD.direction.x,lightD.direction.y,lightD.direction.z);
 
 			//点光源
-			//glUniform3f(glGetUniformLocation(testShader->ID, "lightPos"), light1.position.x, light1.position.y, light1.position.z);
-			//glUniform3f(glGetUniformLocation(testShader->ID, "lightColor"), light1.color.x,light1.color.y,light1.color.z);
-			//glUniform3f(glGetUniformLocation(testShader->ID, "lightDirUniform"), light1.direction.x,light1.direction.y,light1.direction.z);
-			//glUniform1f(glGetUniformLocation(testShader->ID, "lightP.constant"), light1.constant);
-			//glUniform1f(glGetUniformLocation(testShader->ID, "lightP.linear"), light1.linear);
-			//glUniform1f(glGetUniformLocation(testShader->ID, "lightP.quadratic"), light1.quadratic);
+			glUniform3f(glGetUniformLocation(testShader->ID, "lightP0.pos"), lightP0.position.x, lightP0.position.y, lightP0.position.z);
+			glUniform3f(glGetUniformLocation(testShader->ID, "lightP0.color"), lightP0.color.x,lightP0.color.y,lightP0.color.z);
+			glUniform3f(glGetUniformLocation(testShader->ID, "lightP0.dirToLight"), lightP0.direction.x,lightP0.direction.y,lightP0.direction.z);
+			glUniform1f(glGetUniformLocation(testShader->ID, "lightP0.constant"), lightP0.constant);
+			glUniform1f(glGetUniformLocation(testShader->ID, "lightP0.linear"), lightP0.linear);
+			glUniform1f(glGetUniformLocation(testShader->ID, "lightP0.quadratic"), lightP0.quadratic);
+
+			glUniform3f(glGetUniformLocation(testShader->ID, "lightP1.pos"), lightP1.position.x, lightP1.position.y, lightP1.position.z);
+			glUniform3f(glGetUniformLocation(testShader->ID, "lightP1.color"), lightP1.color.x, lightP1.color.y, lightP1.color.z);
+			glUniform3f(glGetUniformLocation(testShader->ID, "lightP1.dirToLight"), lightP1.direction.x, lightP1.direction.y, lightP1.direction.z);
+			glUniform1f(glGetUniformLocation(testShader->ID, "lightP1.constant"), lightP1.constant);
+			glUniform1f(glGetUniformLocation(testShader->ID, "lightP1.linear"), lightP1.linear);
+			glUniform1f(glGetUniformLocation(testShader->ID, "lightP1.quadratic"), lightP1.quadratic);
+			
+			glUniform3f(glGetUniformLocation(testShader->ID, "lightP2.pos"), lightP2.position.x, lightP2.position.y, lightP2.position.z);
+			glUniform3f(glGetUniformLocation(testShader->ID, "lightP2.color"), lightP2.color.x, lightP2.color.y, lightP2.color.z);
+			glUniform3f(glGetUniformLocation(testShader->ID, "lightP2.dirToLight"), lightP2.direction.x, lightP2.direction.y, lightP2.direction.z);
+			glUniform1f(glGetUniformLocation(testShader->ID, "lightP2.constant"), lightP2.constant);
+			glUniform1f(glGetUniformLocation(testShader->ID, "lightP2.linear"), lightP2.linear);
+			glUniform1f(glGetUniformLocation(testShader->ID, "lightP2.quadratic"), lightP2.quadratic);
+			
+			glUniform3f(glGetUniformLocation(testShader->ID, "lightP3.pos"), lightP3.position.x, lightP3.position.y, lightP3.position.z);
+			glUniform3f(glGetUniformLocation(testShader->ID, "lightP3.color"), lightP3.color.x, lightP3.color.y, lightP3.color.z);
+			glUniform3f(glGetUniformLocation(testShader->ID, "lightP3.dirToLight"), lightP3.direction.x, lightP3.direction.y, lightP3.direction.z);
+			glUniform1f(glGetUniformLocation(testShader->ID, "lightP3.constant"), lightP3.constant);
+			glUniform1f(glGetUniformLocation(testShader->ID, "lightP3.linear"), lightP3.linear);
+			glUniform1f(glGetUniformLocation(testShader->ID, "lightP3.quadratic"), lightP3.quadratic);
 
 			//聚光灯
-			glUniform1f(glGetUniformLocation(testShader->ID, "lightS.cosPhyInner"), light2.cosPhyInner);
-			glUniform1f(glGetUniformLocation(testShader->ID, "lightS.cosPhyOutter"), light2.cosPhyOutter);
-			glUniform3f(glGetUniformLocation(testShader->ID, "lightPos"), light2.position.x, light2.position.y, light2.position.z);
-			glUniform3f(glGetUniformLocation(testShader->ID, "lightColor"), light2.color.x,light2.color.y,light2.color.z);
-			glUniform3f(glGetUniformLocation(testShader->ID, "lightDirUniform"), light2.direction.x,light2.direction.y,light2.direction.z);
+			glUniform1f(glGetUniformLocation(testShader->ID, "lightS.cosPhyInner"), lightS.cosPhyInner);
+			glUniform1f(glGetUniformLocation(testShader->ID, "lightS.cosPhyOutter"), lightS.cosPhyOutter);
+			glUniform3f(glGetUniformLocation(testShader->ID, "lightS.pos"), lightS.position.x, lightS.position.y, lightS.position.z);
+			glUniform3f(glGetUniformLocation(testShader->ID, "lightS.color"), lightS.color.x,lightS.color.y,lightS.color.z);
+			glUniform3f(glGetUniformLocation(testShader->ID, "lightS.dirToLight"), lightS.direction.x,lightS.direction.y,lightS.direction.z);
+			glUniform1f(glGetUniformLocation(testShader->ID, "lightS.constant"), lightS.constant);
+			glUniform1f(glGetUniformLocation(testShader->ID, "lightS.linear"), lightS.linear);
+			glUniform1f(glGetUniformLocation(testShader->ID, "lightS.quadratic"), lightS.quadratic);
 
 			//照相机
 			glUniform3f(glGetUniformLocation(testShader->ID, "cameraPos"), camera.Position.x, camera.Position.y, camera.Position.z);
@@ -324,19 +357,19 @@ void processInput(GLFWwindow* window)
 	}
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
 	{
-		camera.speedZ = 0.01f;
+		camera.speedZ = 0.005f;
 	}
 	else if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
 	{
-		camera.speedZ = -0.01f;
+		camera.speedZ = -0.005f;
 	}
 	else if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
 	{
-		camera.speedX = -0.01f;
+		camera.speedX = -0.005f;
 	}
 	else if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
 	{
-		camera.speedX = 0.01f;
+		camera.speedX = 0.005f;
 	}
 	else
 	{
