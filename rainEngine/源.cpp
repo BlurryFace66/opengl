@@ -17,6 +17,7 @@ using namespace std;
 #include"LightPoint.h"
 #include"LightSpot.h"
 #include"Mesh.h"
+#include"Model.h"
 
 #pragma region Model Data
 
@@ -124,8 +125,10 @@ void mouse_callback(GLFWwindow* window, double xPos, double yPos);
 
 unsigned int LoadImageToGPU(const char* filename, GLint internalFormat, GLenum format, int textureSlot);
 
-int main()
+int main(int argc,char* argv[])
 {
+	std::string exePath = argv[0];
+	//std::cout << exePath.substr(0, exePath.find_last_of('\\')) << std::endl;
 	#pragma region Open A Window
 		glfwInit();
 		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -179,7 +182,8 @@ int main()
 	#pragma endregion
 
 	#pragma region Init and Load Models to VAO,VBO
-			Mesh cube(vertices);
+		Mesh cube(vertices);
+		Model model(exePath.substr(0, exePath.find_last_of('\\'))+"\\model\\girl.obj");
 
 		//unsigned int VAO;
 		//glGenVertexArrays(1, &VAO);
