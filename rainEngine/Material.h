@@ -12,7 +12,7 @@ public:
 	unsigned int diffuse;
 	unsigned int specular;
 	glm::vec3 ambient;
-	float shininess;
+	float shininess;    //¼õÉÙ¸ß¹â
 
 	Material(Shader* _shader, unsigned int _diffuse, unsigned int _specular,glm::vec3 _ambient,float _shininess);
 };

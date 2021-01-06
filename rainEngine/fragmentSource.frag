@@ -11,7 +11,6 @@ struct Material
 	sampler2D specular;  
 	float shininess;
 };
-
 struct LightDirectional
 {
 	vec3 pos;
@@ -86,7 +85,6 @@ vec3 CalcLightPoint(LightPoint light,vec3 uNormal,vec3 dirToCamera)
 	vec3 result=diffColor+specColor;
 	return result;
 }
-
 vec3 CalcLightSpot(LightSpot light,vec3 uNormal,vec3 dirToCamera)
 {
 	//attenuation
