@@ -16,6 +16,7 @@ using namespace std;
 #include"LightDirectional.h"
 #include"LightPoint.h"
 #include"LightSpot.h"
+#include"Mesh.h"
 
 #pragma region Model Data
 
@@ -93,20 +94,20 @@ Camera camera(glm::vec3(0, 0, 3.0f), glm::radians(-15.0f), glm::radians(180.0f),
 #pragma endregion
 
 #pragma region Light Declare
-LightDirectional lightD = LightDirectional(glm::vec3(10.0f , 1.0f , - 5.0f),glm::vec3(glm::radians(45.0f) , glm::radians(45.0f), glm::radians(45.0f)),
+LightDirectional lightD(glm::vec3(10.0f , 1.0f , - 5.0f),glm::vec3(glm::radians(45.0f) , glm::radians(45.0f), glm::radians(45.0f)),
 	glm::vec3(2.0f, 2.0f, 2.0f));
 //R,G,B三个照亮中间
-LightPoint lightP0 = LightPoint(glm::vec3(-3.0f, -2.0f, 0), glm::vec3(glm::radians(45.0f), glm::radians(45.0f), 0),
+LightPoint lightP0(glm::vec3(-3.0f, -2.0f, 0), glm::vec3(glm::radians(45.0f), glm::radians(45.0f), 0),
 	glm::vec3(1.0f, 0.0, 0));
-LightPoint lightP1 = LightPoint(glm::vec3(0.0f, 3.0f, 0.0f), glm::vec3(glm::radians(45.0f), glm::radians(45.0f), 0),
+LightPoint lightP1(glm::vec3(0.0f, 3.0f, 0.0f), glm::vec3(glm::radians(45.0f), glm::radians(45.0f), 0),
 	glm::vec3(0.0, 1.0f, 0));
-LightPoint lightP2 = LightPoint(glm::vec3(0, 0, 2.0f), glm::vec3(glm::radians(45.0f), glm::radians(45.0f), 0),
+LightPoint lightP2(glm::vec3(0, 0, 2.0f), glm::vec3(glm::radians(45.0f), glm::radians(45.0f), 0),
 	glm::vec3(0, 0, 1.0f));
 //照亮远处两个方块
-LightPoint lightP3 = LightPoint(glm::vec3(0.0f, 0.0f, -12.0f), glm::vec3(glm::radians(45.0f), glm::radians(45.0f), 0),
+LightPoint lightP3(glm::vec3(0.0f, 0.0f, -12.0f), glm::vec3(glm::radians(45.0f), glm::radians(45.0f), 0),
 	glm::vec3(1.0f, 0.0f, 1.0f));
 //聚光灯照亮底面
-LightSpot lightS = LightSpot(glm::vec3(0.0f, -5.0f, 0.0f), glm::vec3(glm::radians(-90.0f), 0, 0),
+LightSpot lightS(glm::vec3(0.0f, -5.0f, 0.0f), glm::vec3(glm::radians(-90.0f), 0, 0),
 	glm::vec3(2.0f, 2.0f, 2.0f));
 #pragma endregion
 
@@ -178,30 +179,31 @@ int main()
 	#pragma endregion
 
 	#pragma region Init and Load Models to VAO,VBO
+			Mesh cube(vertices);
 
-		unsigned int VAO;
-		glGenVertexArrays(1, &VAO);
-		glBindVertexArray(VAO);
-
-		unsigned int VBO;
-		glGenBuffers(1, &VBO);
-		glBindBuffer(GL_ARRAY_BUFFER, VBO);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
+		//unsigned int VAO;
+		//glGenVertexArrays(1, &VAO);
+		//glBindVertexArray(VAO);
+		//
+		//unsigned int VBO;
+		//glGenBuffers(1, &VBO);
+		//glBindBuffer(GL_ARRAY_BUFFER, VBO);
+		//glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+		//
 		//unsigned int EBO;
 		//glGenBuffers(1, &EBO);
 		//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 		//glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);//先绑定EBO然后用glBufferData把索引复制到缓冲里
-
-		// 位置属性
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid*)0);
-		glEnableVertexAttribArray(0);
-		//光照属性
-		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
-		glEnableVertexAttribArray(1);
-		// UV属性
-		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid*)(6 * sizeof(GLfloat)));
-		glEnableVertexAttribArray(2);		
+		//
+		//// 位置属性
+		//glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid*)0);
+		//glEnableVertexAttribArray(0);
+		////光照属性
+		//glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
+		//glEnableVertexAttribArray(1);
+		//// UV属性
+		//glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid*)(6 * sizeof(GLfloat)));
+		//glEnableVertexAttribArray(2);		
 
 #pragma endregion
 
@@ -253,7 +255,7 @@ int main()
 		//照相机位置变化后，viewMatrix也要变
 		viewMat = camera.GetViewMatrix();
 
-		for (GLuint i = 0; i < 10; i++)
+		for (GLuint i = 0; i < 1; i++)
 		{
 			//设置 model matrix
 			modelMat = glm::translate(glm::mat4(1.0f), cubePositions[i]);
@@ -264,10 +266,10 @@ int main()
 			testShader->use();
 
 			//设置materials的texture参数
-			glActiveTexture(GL_TEXTURE0);
-			glBindTexture(GL_TEXTURE_2D, myMaterial->diffuse);
-			glActiveTexture(GL_TEXTURE0+1);    //或者写GL_TEXTURE1也行
-			glBindTexture(GL_TEXTURE_2D, myMaterial->specular);
+			//glActiveTexture(GL_TEXTURE0);
+			//glBindTexture(GL_TEXTURE_2D, myMaterial->diffuse);
+			//glActiveTexture(GL_TEXTURE0+1);    //或者写GL_TEXTURE1也行
+			//glBindTexture(GL_TEXTURE_2D, myMaterial->specular);
 
 			//设置materials的uniform参数
 			//glUniform1i(glGetUniformLocation(testShader->ID, "ourTexture1"), 0);
@@ -334,10 +336,11 @@ int main()
 	
 
 			//设置模型
-			glBindVertexArray(VAO);
+			//glBindVertexArray(VAO);
 
 			//Drawcall
-			glDrawArrays(GL_TRIANGLES, 0, 36);
+			//glDrawArrays(GL_TRIANGLES, 0, 36);
+			cube.Draw(myMaterial->shader);
 		}
 		//glBindVertexArray(0);
 
